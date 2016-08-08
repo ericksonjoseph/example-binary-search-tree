@@ -33,6 +33,13 @@ public class Main {
         System.out.println("Finding 3:");
         Node found = binaryTree.findNode(3);
         System.out.println(found);
+
+        System.out.println("Remove 8:");
+        boolean deleted = binaryTree.removeNode(8);
+        System.out.println(deleted);
+
+        System.out.println("In-Order Traversal:");
+        binaryTree.inOrderTraversal(binaryTree.root);
     }
 
     public void addNode(int key, String value) {
@@ -89,6 +96,110 @@ public class Main {
         }
 
         return focus;
+    }
+
+    public boolean removeNode(int key) {
+
+        Node focus = root;
+        Node parent = root;
+
+        boolean leftChild = true;
+
+        // First we need to find the node
+        while (focus.key != key) {
+
+            parent = focus;
+
+            if (key < focus.key) {
+
+                leftChild = true;
+
+                focus = focus.left;
+            } else {
+
+                leftChild = false;
+
+                focus = focus.right;
+            }
+
+            if (focus == null)
+                return false;
+        }
+
+        // If the node we want to delete has no children
+        if (focus.left == null && focus.right == null) {
+
+            if (focus == root) {
+                root = null;
+            } else if (leftChild) {
+                parent.left = null;
+            } else {
+                parent.right = null;
+            }
+
+        // If it has one child on the left
+        } else if (focus.right == null) {
+
+            if (focus == root) {
+                root = focus.left;
+            } else if (leftChild) {
+                parent.left = focus.left;
+            } else {
+                parent.right = focus.left;
+            }
+
+        // If it has one child on the right
+        } else if (focus.left == null) {
+            if (focus == root) {
+                root = focus.right;
+            } else if (leftChild) {
+                parent.left = focus.right;
+            } else {
+                parent.right = focus.right;
+            }
+
+        // If it has two children
+        } else {
+
+            Node replacement = getReplacementNode(focus);
+
+            if (focus == root) {
+                root = replacement;
+            } else if (leftChild) {
+                parent.left = replacement;
+            } else {
+                parent.right = replacement;
+            }
+
+            replacement.left = focus.left;
+        }
+
+        return true;
+    }
+
+    public Node getReplacementNode(Node replaceNode) {
+
+        Node replacementParent = replaceNode;
+        Node replacement = replaceNode;
+
+        Node focus = replaceNode.right;
+
+        while (focus != null) {
+
+            replacementParent = replacement;
+
+            replacement = focus;
+
+            focus = focus.left;
+        }
+
+        if (replacement != replaceNode.right) {
+
+            replacementParent.left = replacement.right;
+            replacement.right = replaceNode.right;
+        }
+
+        return replacement;
     }
 
     // Print keys from lowest to highest
